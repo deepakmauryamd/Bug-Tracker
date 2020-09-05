@@ -1,0 +1,13 @@
+@model UserLoginModel;
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="jombotron text-center">
+    <h1>Oops!! You do not have access</h1>
+    <img src="~/images/access-denied.png" alt="Access Denied"/>
+    <div class="mt-5 pb-5">
+        <a class="btn btn-secondary btn-lg text-white mr-5" asp-action="SignUp" asp-controller="Account">Sign Up</a>
+        <a class="btn btn-primary btn-lg text-white" asp-action="Login" asp-controller="Account">Login</a>
+    </div>
+</div>

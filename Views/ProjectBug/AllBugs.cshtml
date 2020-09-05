@@ -1,0 +1,108 @@
+@model BugModel;
+@{
+    ViewData["Title"] = "All Bugs";
+}
+<div class="container">
+    <div class="row mt-5 d-md-flex d-lg-flex justify-content-between">
+        <h3 class="display-5">Project - <span class="font-weight-bold">@ViewBag.ProjectName</span></h3>
+        <a asp-controller="ProjectBug" asp-action="AddBug" asp-route-id="@ViewBag.ProjectId" class="btn btn-lg btn-primary">Add Bug</a>
+    </div>
+    @if(ViewBag.SuccessMessage != null)
+    {
+        <div class="alert alert-success text-center mt-5" id="success-alert">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+    <div class="row mt-5 mb-5">
+        @if(ViewBag.bugList != null)
+        {
+            <div class="table-responsive p-0 bg-white">    
+                <table class="table table-hover text-center">
+                    <tr class="table-active">
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Created On</th>
+                        <th scope="col">Resolved On</th>
+                        <th scope="col">Mark Resolved</th>
+                        <th scope="col">Edit</th>
+                        <th scope="col">Delete</th>
+
+                    </tr>
+                    @foreach(var bug in ViewBag.bugList)
+                    {
+                        <tr>
+                            <td>@bug.Title</td>
+                            <td>@(bug.Description==null? "(no description)": bug.Description)</td>
+                            <td><span class="priority">@bug.PriorityEnum</span></td>
+                            <td>@bug.BugStatusEnum</td>
+                            <td class="createdOnDate">@bug.CreatedOn.ToString("s", System.Globalization.CultureInfo.InvariantCulture)</td>
+                            <td class="resolvedOnDate">@(bug.ResolvedOn != null ? bug.ResolvedOn.ToString("s", System.Globalization.CultureInfo.InvariantCulture) : "")</td>
+                            
+                            @if(bug.ResolvedOn == null)
+                            {
+                                <td><a asp-action="MarkResolve" asp-controller="ProjectBug" asp-route-id="@bug.Id" asp-route-pid="@ViewBag.ProjectId"><img class="Image-icon" src="~/images/tick1.svg"/></a></td>
+                                <td><a asp-action="EditBug" asp-controller="ProjectBug" asp-route-id="@bug.Id" asp-route-pid="@ViewBag.ProjectId" >Edit</a></td>
+                            }
+                            else
+                            {
+                                <td>Resolved</td>
+                                <td> - </td>
+                            }
+                            <td><a asp-action="DeleteBug" asp-controller="ProjectBug" asp-route-id="@bug.Id" asp-route-pid="@ViewBag.ProjectId"><img class="Image-icon" src="~/images/trash.svg"/></a></td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        }
+        else{
+            <h4> Yey!! No bugs are there</h4>
+        }
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        const priorityItems = document.querySelectorAll('.priority');
+        for(let i=0; i< priorityItems.length; i++)
+        {
+            if(priorityItems[i].innerText === 'High')
+            {
+                priorityItems[i].classList.add('bg-danger');
+            }
+            if(priorityItems[i].innerText === 'Medium')
+            {
+                priorityItems[i].classList.add('bg-orange');
+            }
+            if(priorityItems[i].innerText === 'Low')
+            {
+                priorityItems[i].classList.add('bg-warning');
+            }
+            
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js" integrity="sha512-rmZcZsyhe0/MAjquhTgiUcb4d9knaFc7b5xAfju483gbEXTkeJRUMIPk6s3ySZMYUHEcjKbjLjyddGWMrNEvZg==" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function(){
+            $(".createdOnDate").each(function(){
+                const createdOn = $(this)[0].innerText;
+                const date = new Date(createdOn);
+                const dateInAgos = moment(date).fromNow();
+                $(this).text(dateInAgos); 
+            });
+
+            $(".resolvedOnDate").each(function(){
+                const createdOn = $(this)[0].innerText;
+                if(createdOn !== "")  { 
+                    const date = new Date(createdOn);
+                    const dateInAgos = moment(date).fromNow();
+                    $(this).text(dateInAgos); 
+                } 
+            });
+        });
+    </script>
+
+}

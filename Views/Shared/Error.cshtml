@@ -1,0 +1,13 @@
+@{
+    Layout = "_AccountLayout";
+}
+
+@if(ViewBag.ErrorMessage != null)
+{
+    <h2 class="text-danger">@ViewBag.Message</h2>
+    <h5 class="text-danger">@ViewBag.ErrorMessage</h5>
+}
+else
+{
+    <h2 class="text-center">Something Went Wrong!!</h2>
+}

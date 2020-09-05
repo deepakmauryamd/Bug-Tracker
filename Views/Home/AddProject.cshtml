@@ -1,0 +1,40 @@
+﻿@model ProjectModel;
+@{
+    ViewData["Title"] = "Add your new Project";
+}
+
+<div class="container mt-lg-5">
+    <div class="">
+        <h4 class="display-5 text-capitalize mb-lg-5">@ViewData["Title"]</h4>
+        <form method="POST" asp-controller="home" asp-action="addproject">
+            <div class="row ">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control"/>
+                        <span class="text-danger" asp-validation-for="Name"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ProjectManagerId"></label>
+                        <select asp-for="ProjectManagerId" class="form-control" asp-items="@ViewBag.projectManagers">
+                            <option value="">Select project manager</option>
+                        </select>
+                        <span class="text-danger" asp-validation-for="ProjectManagerId"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="TeamMembersId"></label>
+                        <select asp-for="TeamMembersId" class="form-control custom-height" asp-items="@ViewBag.users">
+                            
+                        </select>
+                        <span class="text-danger" asp-validation-for="TeamMembersId"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="form-control btn btn-lg btn-primary text-uppercase mt-lg-5" value="Add project"/>
+            </div>
+        </form>
+    </div>
+</div>

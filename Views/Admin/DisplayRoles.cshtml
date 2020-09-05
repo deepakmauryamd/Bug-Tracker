@@ -1,0 +1,74 @@
+@using Microsoft.AspNetCore.Identity;
+@model IEnumerable<IdentityRole>;
+@{
+    ViewData["Title"] = "All Roles";
+}
+
+@if(ViewBag.message != null)
+{
+    <div class="row">
+        <p class="text-danger mt-5">@ViewBag.message</p>
+    </div>
+}
+@if(Model.Any())
+{
+    <div class="row ml-1">
+        <a asp-action="createroles" asp-controller="Admin" class="btn btn-primary btn-lg">Create Role</a>
+    </div>
+    <div class="conatainer d-flex flex-wrap justify-content-between">
+        @foreach(var role in Model)
+        {
+            <div class="card mt-5">
+                <div class="card-header">
+                    @role.Id
+                </div>
+                <div class="card-body">
+                    <h2 class="display-5 mb-3">@role.Name</h2>
+                    <a asp-action="EditRole" asp-controller="Admin" asp-route-id="@role.Id" class="btn btn-primary mr-2">Edit</a>
+                    <a href="#" data-toggle="modal" class="btn btn-danger delete-btn" data-id="@role.Id" data-rolename="@role.Name" data-target="#exampleModalCenter">Delete</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <partial name="_DeleteModal"/>
+}
+else{
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">No roles created yet</h5>
+            <a asp-action="createroles" asp-controller="Admin" class="btn btn-primary btn-lg">Create Role</a>
+        </div>
+    </div>
+}
+
+@section Scripts
+{
+    <script>
+        $(document).ready(()=>{
+            $(".delete-btn").on("click", function () {
+
+                $("#exampleModalCenter").modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+
+                const Id = $(this).data('id');
+                const rolename = $(this).data('rolename');
+                console.log(Id, rolename);
+                
+                $(".modal-body").append(`<div id="rolename"><p> Are you sure you want to delete role <span class="font-weight-bold">${rolename}</span></p></div>`);
+                $(".delete-form").attr('action', `/DeleteRole/${Id}`);
+                
+            });
+        });
+
+        $("#close").on("click", ()=>{
+            $("#rolename").remove();
+            $(".delete-form").removeAttr('action');
+        });
+
+
+        
+    </script>
+}

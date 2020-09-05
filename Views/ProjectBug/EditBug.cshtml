@@ -1,0 +1,77 @@
+@model BugModel;
+@{
+    ViewData["Title"]= "Edit Bug";
+}
+
+<div class="container d-flex justify-content-center">
+    <div class="col-md-6">
+        <h5 class="display-5">Edit bug from @Model.ProjectName</h5>
+        <form method="POST" asp-action="EditBug" asp-controller="ProjectBug">
+            @if(ViewBag.message != null)
+            {
+                <p class="text-danger">@ViewBag.message</p>
+            }
+            <div class="form-group">
+                <label asp-for="Title"></label>
+                <input class="form-control" asp-for="Title"/>
+                <span class="text-danger" asp-validation-for="Title"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <input class="form-control" asp-for="Description"/>
+                <span class="text-danger" asp-validation-for="Description"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PriorityId"></label>
+                <input type="hidden" value="0" required id="priorityId" asp-for="PriorityId"/>
+                <ul class=" priority-list">
+                    @for(int i=0; i < ViewBag.bugPriorityList.Count; i++)
+                    {
+                        <li class="priority-list-item" id="@ViewBag.bugPriorityList[i].Id">@ViewBag.bugPriorityList[i].Name</li>
+                    } 
+                </ul>
+                <span class="text-danger" id="priorityIdError"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AssignedToIds"></label>
+                <select class="form-control" asp-for="AssignedToIds" asp-items="@ViewBag.teamMembers">
+                    <option value="">Choose whom to assign </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-block btn-success text-uppercase mt-4" value="Save"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $("form input[type=submit]").on('click',function(e){
+            console.log($('#priorityId').val() )
+            if($('#priorityId').val() === "0")
+            {
+                $("#priorityIdError").text("Priority is required");
+            }
+            return;
+        });
+
+        $(".priority-list-item").on('click', function(){
+            $('.priority-list-item').removeClass('background_selected');
+            $(this).addClass('background_selected');
+            $('#priorityId').val($(this)[0].id);
+        });
+        
+        $(document).ready(function(){
+            $(".priority-list-item").each(function(){
+                if(parseInt($(this)[0].id) ===  @Html.Raw(Model.PriorityId))
+                {
+                    $(this).addClass('background_selected');
+                }   
+            });
+        
+        });
+
+    </script>
+}
