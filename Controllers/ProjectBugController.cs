@@ -6,6 +6,8 @@ using BugTracker.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using cloudscribe.Pagination.Models;
+
 
 namespace BugTracker.Controllers
 {
@@ -21,20 +23,27 @@ namespace BugTracker.Controllers
             _bugRepo = bugRepo;
         }
 
-        [HttpGet("/AllBugs/{id}")]
-        public async Task<ActionResult> AllBugs(int Id, string SuccessMessage)
+        [HttpGet("/AllBugs/{pid}")]
+        public async Task<ActionResult> AllBugs(int PId, string SuccessMessage, int pageNumber=1, int pageSize=5)
         {
-            if (Id > 0)
+            if (PId > 0)
             {
-                var project = await _projectRepo.GetProjectNameById(Id);
+                var project = await _projectRepo.GetProjectNameById(PId);
                 if (project != null)
                 {
-                    var BugList = await _bugRepo.GetAllBugs(Id);
+                    int excludeRecords = (pageNumber * pageSize) - pageSize;
+                    var BugList = await _bugRepo.GetAllBugs(PId, pageSize, excludeRecords);
+                    int totalBugCount = await _bugRepo.TotalBugs(PId);
                     ViewBag.ProjectName = project.Name;
-                    ViewBag.bugList = BugList;
-                    ViewBag.ProjectId = Id;
+                    ViewBag.ProjectId = PId;
                     ViewBag.SuccessMessage = SuccessMessage;
-                    return View();
+                    var result = new PagedResult<BugModel>{
+                        Data = BugList.ToList(),
+                        TotalItems = totalBugCount,
+                        PageNumber = pageNumber,
+                        PageSize = pageSize
+                    };
+                    return View(result);
                 }
             }
             return RedirectToAction("Index", "Home");
@@ -78,7 +87,7 @@ namespace BugTracker.Controllers
                 var isBugAdded = await _bugRepo.AddBug(model);
                 if (isBugAdded)
                 {
-                    return RedirectToAction(nameof(AllBugs), new { Id = Id });
+                    return RedirectToAction(nameof(AllBugs), new { PId = Id });
                 }
             }
             string message = "Something went wrong.";

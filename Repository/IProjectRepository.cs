@@ -9,7 +9,8 @@ namespace BugTracker.Repository
     {
         Task<bool> AddProject(ProjectModel model);
         Task<bool> DeleteProject(int ProjectId);
-        Task<IEnumerable<ProjectModel>> GetAllProject();
+        Task<int> TotalProjects();
+        Task<IEnumerable<ProjectModel>> GetAllProject(int Limit, int Offset);
         Task<ProjectModel> GetProjectNameById(int Id);
         Task<bool> EditProject(ProjectModel model);
         Task<ProjectModel> GetProjectDetails(int Id);

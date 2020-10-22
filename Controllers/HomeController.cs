@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using BugTracker.Data;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
+using cloudscribe.Pagination.Models;
 
 namespace BugTracker.Controllers
 {
@@ -31,12 +32,14 @@ namespace BugTracker.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string message=null)
+        public async Task<IActionResult> Index(string message=null, int pageNumber=1, int pageSize=5)
         {
-            var projects = await _projectRepo.GetAllProject();
+            int excludeRecords = (pageNumber * pageSize) - pageSize;
+            var projects = await _projectRepo.GetAllProject(pageSize, excludeRecords);
+            var totalProjects = await _projectRepo.TotalProjects();
             if (projects != null)
             {
-                ViewBag.projects = projects;
+                // ViewBag.projects = projects;
                 ViewBag.totalResolvedBugsCount = await _bugRepo.GetResolvedBugCount();
 
                 int totalBugsCount = 0;
@@ -49,7 +52,13 @@ namespace BugTracker.Controllers
                 ViewBag.totalBugsCount = totalBugsCount;
             }
             ViewBag.Message = message;
-            return View();
+            var result = new PagedResult<ProjectModel>{
+                Data = projects.ToList(),
+                TotalItems = totalProjects,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            return View(result);
         }
 
         [Authorize(Roles = "Manager")]

@@ -1,7 +1,10 @@
-@model BugModel;
+@model cloudscribe.Pagination.Models.PagedResult<BugModel>
 @{
     ViewData["Title"] = "All Bugs";
+    ViewData["Controller"] = "ProjectBug";
+    ViewData["Action"]= "AllBugs";
 }
+
 <div class="container">
     <div class="row mt-5 d-md-flex d-lg-flex justify-content-between">
         <h3 class="display-5">Project - <span class="font-weight-bold">@ViewBag.ProjectName</span></h3>
@@ -15,9 +18,10 @@
         </div>
     }
     <div class="row mt-5 mb-5">
-        @if(ViewBag.bugList != null)
+        @if(Model.Data != null)
         {
-            <div class="table-responsive p-0 bg-white">    
+            <div class="container mt-1 p-0 bg-white">
+            <div class="table-responsive">    
                 <table class="table table-hover text-center">
                     <tr class="table-active">
                         <th scope="col">Title</th>
@@ -31,7 +35,7 @@
                         <th scope="col">Delete</th>
 
                     </tr>
-                    @foreach(var bug in ViewBag.bugList)
+                    @foreach(var bug in Model.Data)
                     {
                         <tr>
                             <td>@bug.Title</td>
@@ -39,7 +43,7 @@
                             <td><span class="priority">@bug.PriorityEnum</span></td>
                             <td>@bug.BugStatusEnum</td>
                             <td class="createdOnDate">@bug.CreatedOn.ToString("s", System.Globalization.CultureInfo.InvariantCulture)</td>
-                            <td class="resolvedOnDate">@(bug.ResolvedOn != null ? bug.ResolvedOn.ToString("s", System.Globalization.CultureInfo.InvariantCulture) : "")</td>
+                            <td class="resolvedOnDate">@(bug.ResolvedOn.HasValue ? bug.ResolvedOn.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture) : "")</td>
                             
                             @if(bug.ResolvedOn == null)
                             {
@@ -55,6 +59,8 @@
                         </tr>
                     }
                 </table>
+            </div>
+            <partial name="_Pagination" model="Model" view-data="ViewData"/>
             </div>
         }
         else{

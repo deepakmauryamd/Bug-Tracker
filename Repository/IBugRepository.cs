@@ -11,7 +11,7 @@ namespace BugTracker.Repository
 
         Task<bool> AddBug(BugModel model);
 
-        Task<IEnumerable<BugModel>> GetAllBugs(int Id);
+        Task<IEnumerable<BugModel>> GetAllBugs(int Id, int Limit, int Offsest);
 
         Task<BugModel> GetBugDetails(int ProjectId, int BugId);
 

@@ -1,10 +1,12 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@model cloudscribe.Pagination.Models.PagedResult<ProjectModel>
+@using Microsoft.AspNetCore.Identity
 @using BugTracker.Data
 @inject SignInManager<ApplicationUser> SignInManager
 @inject RoleManager<IdentityRole> RoleManager
-@model ProjectModel
 @{
     ViewData["Title"] = "Home Page";
+    ViewData["Controller"] = "Home";
+    ViewData["Action"] = "Index";
 }
 
 @if(ViewBag.Message != null){
@@ -15,14 +17,14 @@
         </div>
     </div>
 }
-@if(ViewBag.projects != null)
+@if(Model.Data != null)
 {
    <div class="container pb-5">
        <div class="card-deck mt-5 justify-content-center">
             <div class="card border-primary mb-3 text-center" style="max-width: 18rem;">
                 <div class="card-header font-weight-bold">Total Projects</div>
                 <div class="card-body">
-                    <h1 class="card-title text-primary">@ViewBag.projects.Count</h1>
+                    <h1 class="card-title text-primary">@Model.TotalItems</h1>
                 </div>
             </div>
             <div class="card border-danger mb-3 text-center" style="max-width: 18rem;">
@@ -55,10 +57,10 @@
                             <th scope="col">Delete</th>
                         }
                     </tr>
-                    @foreach(var project in ViewBag.projects)
+                    @foreach(var project in Model.Data)
                     {
                         <tr>
-                            <td><a asp-controller="ProjectBug" asp-action="AllBugs" asp-route-id="@project.Id">@project.Name</a></td>
+                            <td><a asp-controller="ProjectBug" asp-action="AllBugs" asp-route-pid="@project.Id">@project.Name</a></td>
                             <td>@project.TotalBugs</td>
                             <td>@project.ProjectManager</td>
                             <td>@project.TeamMembersCount</td>
@@ -71,6 +73,7 @@
                     }
                 </table>
             </div>
+            <partial name="_Pagination" model="Model" view-data="ViewData"/>
         </div>
     </div>
     <partial name="_DeleteModal"/>
@@ -94,7 +97,6 @@ else
 
                 const projectId = $(this).data('id');
                 const projectName = $(this).data('projectname');
-                console.log(projectId, projectName);
                 
                 $(".modal-body").append(`<div id="projectName">Are you sure you want to delete project <p class="font-weight-bold">${projectName}</p></div>`);
                 $(".delete-form").attr('action', `/Home/DeleteProject/${projectId}`);
@@ -107,6 +109,5 @@ else
             $("#projectName").remove();
             $(".delete-form").removeAttr('action');
         });
-
     </script>
 }

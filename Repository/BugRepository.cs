@@ -76,7 +76,7 @@ namespace BugTracker.Repository
             return false;
         }
 
-        public async Task<IEnumerable<BugModel>> GetAllBugs(int Id)
+        public async Task<IEnumerable<BugModel>> GetAllBugs(int Id, int Limit, int Offset)
         {
             List<BugModel> BugList = null;
             try
@@ -88,11 +88,15 @@ namespace BugTracker.Repository
                                             From ProjectBugs
                                             Inner Join BugPriority
                                             on ProjectBugs.BugPriorityId = BugPriority.Id
-                                            Where ProjectBugs.ProjectId = @ProjectId";
+                                            Where ProjectBugs.ProjectId = @ProjectId
+                                            Order by ProjectBugs.Id DESC
+                                            Limit @Limit Offset @Offset;";
                     conn.Open();
                     var result = await conn.QueryAsync(qGetAllBugs, new
                     {
-                        ProjectId = Id
+                        ProjectId = Id,
+                        Limit = Limit,
+                        Offset = Offset
                     });
                     if (result != null && result.AsList().Count > 0)
                     {

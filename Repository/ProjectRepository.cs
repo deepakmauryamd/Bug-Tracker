@@ -104,7 +104,7 @@ namespace BugTracker.Repository
             return projectModel;
         }
 
-        public async Task<IEnumerable<ProjectModel>> GetAllProject()
+        public async Task<IEnumerable<ProjectModel>> GetAllProject(int Limit, int Offset)
         {
             try
             {
@@ -116,9 +116,13 @@ namespace BugTracker.Repository
                                         on Projects.Id = UserProjectMaps.ProjectId
                                         Inner Join AspNetUsers
                                         on Projects.ApplicationUserId = AspNetUsers.Id
-                                        group by Projects.Id, Projects.Name, AspNetUsers.UserName;";
+                                        group by Projects.Id, Projects.Name, AspNetUsers.UserName
+                                        Limit @Limit Offset @Offset;";
                     conn.Open();
-                    var ResultList = await conn.QueryAsync(query);
+                    var ResultList = await conn.QueryAsync(query, new{
+                        Limit= Limit,
+                        Offset= Offset
+                    });
                     List<ProjectModel> projects = new List<ProjectModel>();
 
                     foreach (var project in ResultList)
@@ -298,6 +302,25 @@ namespace BugTracker.Repository
                 Console.WriteLine(ex.Message);
             }
             return false;
+        }
+
+        public async Task<int> TotalProjects()
+        {
+            int totalProjects = 0;
+            try
+            {
+                using(IDbConnection conn = Connection)
+                {
+                    string query = @"Select count(*)
+                                    From Projects;";
+                    totalProjects = await conn.QueryFirstAsync<int>(query);
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return totalProjects;
         }
     }
 }
