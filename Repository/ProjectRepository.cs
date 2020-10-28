@@ -104,7 +104,7 @@ namespace BugTracker.Repository
             return projectModel;
         }
 
-        public async Task<IEnumerable<ProjectModel>> GetAllProject(int Limit, int Offset)
+        public async Task<IEnumerable<ProjectModel>> GetProjects(int Limit, int Offset)
         {
             try
             {
@@ -304,23 +304,23 @@ namespace BugTracker.Repository
             return false;
         }
 
-        public async Task<int> TotalProjects()
+        public async Task<IEnumerable<ProjectModel>> AllProjects()
         {
-            int totalProjects = 0;
+            IEnumerable<ProjectModel> projects = null;
             try
             {
                 using(IDbConnection conn = Connection)
                 {
-                    string query = @"Select count(*)
+                    string query = @"Select Id, Name
                                     From Projects;";
-                    totalProjects = await conn.QueryFirstAsync<int>(query);
+                    projects = await conn.QueryAsync<ProjectModel>(query);
                 }
             }
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            return totalProjects;
+            return projects;
         }
     }
 }

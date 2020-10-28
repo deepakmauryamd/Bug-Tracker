@@ -23,7 +23,6 @@ namespace BugTracker.Controllers
         private readonly IBugRepository _bugRepo;
         private readonly UserManager<ApplicationUser> _userManager;
 
-
         public HomeController(IProjectRepository projectRepo, IBugRepository bugRepo, UserManager<ApplicationUser> userManager)
         {
             _projectRepo = projectRepo;
@@ -35,26 +34,22 @@ namespace BugTracker.Controllers
         public async Task<IActionResult> Index(string message=null, int pageNumber=1, int pageSize=5)
         {
             int excludeRecords = (pageNumber * pageSize) - pageSize;
-            var projects = await _projectRepo.GetAllProject(pageSize, excludeRecords);
-            var totalProjects = await _projectRepo.TotalProjects();
-            if (projects != null)
+            var projects = await _projectRepo.GetProjects(pageSize, excludeRecords);
+            if(projects != null && projects.Any())
             {
-                // ViewBag.projects = projects;
-                ViewBag.totalResolvedBugsCount = await _bugRepo.GetResolvedBugCount();
-
-                int totalBugsCount = 0;
-                foreach (var project in projects)
+                foreach(var project in projects)
                 {
                     project.TotalBugs = await _bugRepo.TotalBugs(project.Id);
-                    totalBugsCount += project.TotalBugs;
                 }
-
-                ViewBag.totalBugsCount = totalBugsCount;
             }
+            var details = await OverallDetails();
+            ViewBag.totalResolvedBugsCount = details.Item2;
+            ViewBag.totalBugsCount = details.Item3;
             ViewBag.Message = message;
+            
             var result = new PagedResult<ProjectModel>{
                 Data = projects.ToList(),
-                TotalItems = totalProjects,
+                TotalItems = details.Item1,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
@@ -157,6 +152,22 @@ namespace BugTracker.Controllers
             return teamMembers;
         }
 
+        private async Task<Tuple<int, int, int>> OverallDetails()
+        {
+            var projects = await _projectRepo.AllProjects();
+            int totalResolvedBugsCount =0;
+            int totalBugsCount=0;
+            if (projects != null && projects.Any())
+            {     
+                totalResolvedBugsCount = await _bugRepo.GetResolvedBugCount();
+                foreach (var project in projects)
+                {
+                    totalBugsCount += await _bugRepo.TotalBugs(project.Id);
+                }
+            }
+            var result = new Tuple<int, int , int>(projects.Count(), totalResolvedBugsCount, totalBugsCount);
+            return result;
+        }
         [AllowAnonymous]
         [Route("/notfoundpage")]
         public IActionResult NotFoundPage()
