@@ -424,6 +424,9 @@ $RECYCLE.BIN/
 .idea/
 *.sln.iml
 
+# Appsettings
+appsettings.json
+
 ##
 ## Visual Studio Code
 ##
