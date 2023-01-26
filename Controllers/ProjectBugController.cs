@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using cloudscribe.Pagination.Models;
-
+using System.Collections.Generic;
 
 namespace BugTracker.Controllers
 {
@@ -24,7 +24,7 @@ namespace BugTracker.Controllers
         }
 
         [HttpGet("/AllBugs/{pid}")]
-        public async Task<ActionResult> AllBugs(int PId, string SuccessMessage, int pageNumber=1, int pageSize=5)
+        public async Task<ActionResult> AllBugs(int PId, string SuccessMessage, int pageNumber = 1, int pageSize = 5)
         {
             if (PId > 0)
             {
@@ -32,12 +32,13 @@ namespace BugTracker.Controllers
                 if (project != null)
                 {
                     int excludeRecords = (pageNumber * pageSize) - pageSize;
-                    var BugList = await _bugRepo.GetAllBugs(PId, pageSize, excludeRecords);
+                    var BugList = await _bugRepo.GetAllBugs(PId, pageSize, excludeRecords) ?? new List<BugModel>();
                     int totalBugCount = await _bugRepo.TotalBugs(PId);
                     ViewBag.ProjectName = project.Name;
                     ViewBag.ProjectId = PId;
                     ViewBag.SuccessMessage = SuccessMessage;
-                    var result = new PagedResult<BugModel>{
+                    var result = new PagedResult<BugModel>
+                    {
                         Data = BugList.ToList(),
                         TotalItems = totalBugCount,
                         PageNumber = pageNumber,

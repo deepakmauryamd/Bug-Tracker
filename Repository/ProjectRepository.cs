@@ -77,7 +77,7 @@ namespace BugTracker.Repository
                         var ResultGetProjectDetails = await conn.QueryAsync(qGetProjectDetails, new { ProjectId = Id });
                         var ResultGetAllTeamMembers = await conn.QueryAsync(qGetAllTeamMenbers, new { ProjectId = Id });
 
-                        if (ResultGetProjectDetails.Any() && ResultGetAllTeamMembers.Any())
+                        if (ResultGetProjectDetails.Any())
                         {
                             var project = ResultGetProjectDetails.FirstOrDefault();
                             projectModel = new ProjectModel
@@ -85,15 +85,17 @@ namespace BugTracker.Repository
                                 Name = project.Name,
                                 ProjectManagerId = project.ProjectManagerId
                             };
+                        }
+                        if (projectModel != null && ResultGetAllTeamMembers.Any())
+                        {
                             var teamMemberIds = new List<string>();
                             foreach (var member in ResultGetAllTeamMembers)
                             {
                                 teamMemberIds.Add(member.ApplicationUserId);
                             }
                             projectModel.TeamMembersId = teamMemberIds;
-
-                            return projectModel;
                         }
+                        return projectModel;
                     }
                 }
                 catch (Exception ex)
@@ -119,9 +121,10 @@ namespace BugTracker.Repository
                                         group by Projects.Id, Projects.Name, AspNetUsers.UserName
                                         Limit @Limit Offset @Offset;";
                     conn.Open();
-                    var ResultList = await conn.QueryAsync(query, new{
-                        Limit= Limit,
-                        Offset= Offset
+                    var ResultList = await conn.QueryAsync(query, new
+                    {
+                        Limit = Limit,
+                        Offset = Offset
                     });
                     List<ProjectModel> projects = new List<ProjectModel>();
 
@@ -309,14 +312,14 @@ namespace BugTracker.Repository
             IEnumerable<ProjectModel> projects = null;
             try
             {
-                using(IDbConnection conn = Connection)
+                using (IDbConnection conn = Connection)
                 {
                     string query = @"Select Id, Name
                                     From Projects;";
                     projects = await conn.QueryAsync<ProjectModel>(query);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }

@@ -17,7 +17,7 @@ namespace BugTracker.Data
         [Required]
         public DateTime CreatedOn { get; set; }
 
-        public DateTime ResolvedOn { get; set; }
+        public DateTime? ResolvedOn { get; set; }
 
         [Required]
         public int BugPriorityId { get; set; }

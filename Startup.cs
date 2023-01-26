@@ -33,7 +33,7 @@ namespace BugTracker
             services.AddTransient<IBugRepository, BugRepository>();
 
             services.AddDbContext<BugtrackerContext>(options => options.UseMySql
-                    (Configuration.GetConnectionString("bugtrackerdbString")));
+                    (Configuration.GetConnectionString("bugtrackerdbString"), new MySqlServerVersion(new Version())));
 
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<BugtrackerContext>();
             services.Configure<IdentityOptions>(options=>{
@@ -50,7 +50,7 @@ namespace BugTracker
                 options.AccessDeniedPath = "/accessdenied";
             });
 
-            services.AddRazorPages().AddRazorRuntimeCompilation();
+            // services.AddRazorPages().AddRazorRuntimeCompilation();
 
             services.AddControllersWithViews();
             services.AddCloudscribePagination();

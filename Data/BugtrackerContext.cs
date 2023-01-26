@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,5 @@ namespace BugTracker.Data
         public DbSet<UserProjectMap> UserProjectMaps { get; set; }
         public DbSet<ProjectBug> ProjectBugs { get; set; }
         public DbSet<UserProjectBugMap> UserProjectBugMaps { get; set; }
-
-        public DbSet<BugStatus> BugStatus { get; set; }
     }
 }
