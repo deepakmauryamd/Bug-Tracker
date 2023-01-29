@@ -36,10 +36,10 @@ dotnet ef database update
 
 ## Project Screens with Admin role because it has all the access:-
 ### Dashboard
-![Project Overview Dashboard](https://raw.githubusercontent.com/maurya-deepak/Bug-Tracker/master/ReadmeImages/home-screen.png?token=GHSAT0AAAAAAB5ALC5Y7L2ZWPQF2XWKBF2WY6WVHWA)
+![Project Overview Dashboard](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/home-screen.png?token=GHSAT0AAAAAAB5ALC5Y7L2ZWPQF2XWKBF2WY6WVHWA)
 ### Add Project Screen
-![Add Project Screen](https://raw.githubusercontent.com/maurya-deepak/Bug-Tracker/master/ReadmeImages/add-project-screen.png?token=GHSAT0AAAAAAB5ALC5YSKLGJWVVQJEV34KQY6WVN5A)
+![Add Project Screen](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/add-project-screen.png?token=GHSAT0AAAAAAB5ALC5YSKLGJWVVQJEV34KQY6WVN5A)
 ### All Bugs of a Project Dashboard
 ![All bugs Dashboard](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/all-bugs-screen.png?raw=true)
 ### Add Bug Screen
-![Add Bug Screen](https://raw.githubusercontent.com/maurya-deepak/Bug-Tracker/master/ReadmeImages/add-bug-screen.png?token=GHSAT0AAAAAAB5ALC5YQ4AKCWO2F4JLUFDQY6WVNIA)
+![Add Bug Screen](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/add-bug-screen.png?token=GHSAT0AAAAAAB5ALC5YQ4AKCWO2F4JLUFDQY6WVNIA)
