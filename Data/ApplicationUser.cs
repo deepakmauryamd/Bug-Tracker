@@ -5,8 +5,8 @@ namespace BugTracker.Data
 {
     public class ApplicationUser : IdentityUser
     {
-        public virtual ICollection<UserProjectMap> UserProjectMap {get; set;}
-        public virtual ICollection<UserProjectBugMap> UserProjectBugMap {get; set;}
-        
+        public virtual ICollection<UserProjectMap> UserProjectMap { get; set; }
+        public virtual ICollection<UserProjectBugMap> UserProjectBugMap { get; set; }
+
     }
 }

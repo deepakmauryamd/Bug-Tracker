@@ -23,20 +23,20 @@ namespace BugTracker.Controllers
             _bugRepo = bugRepo;
         }
 
-        [HttpGet("/AllBugs/{pid}")]
-        public async Task<ActionResult> AllBugs(int PId, string SuccessMessage, int pageNumber = 1, int pageSize = 5)
+        [HttpGet("/AllBugs/{pId}", Name = "AllBugsActionMethod")]
+        public async Task<ActionResult> AllBugs(int pId, string successMessage, int pageNumber = 1, int pageSize = 5)
         {
-            if (PId > 0)
+            if (pId > 0)
             {
-                var project = await _projectRepo.GetProjectNameById(PId);
+                var project = await _projectRepo.GetProjectNameById(pId);
                 if (project != null)
                 {
                     int excludeRecords = (pageNumber * pageSize) - pageSize;
-                    var BugList = await _bugRepo.GetAllBugs(PId, pageSize, excludeRecords) ?? new List<BugModel>();
-                    int totalBugCount = await _bugRepo.TotalBugs(PId);
+                    var BugList = await _bugRepo.GetAllBugs(pId, pageSize, excludeRecords) ?? new List<BugModel>();
+                    int totalBugCount = await _bugRepo.TotalBugs(pId);
                     ViewBag.ProjectName = project.Name;
-                    ViewBag.ProjectId = PId;
-                    ViewBag.SuccessMessage = SuccessMessage;
+                    ViewBag.ProjectId = pId;
+                    ViewBag.SuccessMessage = successMessage;
                     var result = new PagedResult<BugModel>
                     {
                         Data = BugList.ToList(),
@@ -103,8 +103,8 @@ namespace BugTracker.Controllers
                 var result = await _bugRepo.MarkResolve(Id);
                 if (result)
                 {
-                    string SuccessMessage = "Bug Resolved successfully";
-                    return RedirectToAction(nameof(AllBugs), new { Id = Pid, SuccessMessage = SuccessMessage });
+                    string successMessage = "Bug Resolved successfully";
+                    return RedirectToRoute("AllBugsActionMethod", new { pid = Pid, successMessage = successMessage }); ;
                 }
             }
             return RedirectToAction(nameof(AllBugs), new { Id = Pid });
@@ -119,7 +119,7 @@ namespace BugTracker.Controllers
                 if (result)
                 {
                     string SuccessMessage = "Bug deleted successfully";
-                    return RedirectToAction(nameof(AllBugs), new { Id = Pid, SuccessMessage = SuccessMessage });
+                    return RedirectToRoute("AllBugsActionMethod", new { pid = Pid, successMessage = SuccessMessage }); ;
                 }
             }
             return RedirectToAction(nameof(AllBugs), new { Id = Pid });
@@ -162,7 +162,8 @@ namespace BugTracker.Controllers
                 var isUpdated = await _bugRepo.UpdateBugDetails(model);
                 if (isUpdated)
                 {
-                    return RedirectToAction(nameof(AllBugs), new { Id = Pid });
+                    string message = "Edit successful";
+                    return RedirectToRoute("AllBugsActionMethod", new { pid = Pid, successMessage = message });
                 }
             }
             return View(model);
