@@ -1,33 +1,45 @@
-clone project
-run dotnet restore
+# Bug Tracking Web Application
+It's a web application designed to manage and track bugs of different projects in an organization. It gives single view of all the projects, currently opened bugs and total resolved bugs. This project uses `dotnet core 6.0`, `razor c#`, `Entity Framework Core`, `Identity Core` and `MySQL`.
+
+#### It has 3 access roles `Admin`, `Manager` and `Developer`. 
+- Developer can view all the projects and bugs in each project and also `add`, `edit`, `resolve`, `delete` bugs in the project.
+- Manager can `add Project` as well as all the access which developer has.
+- Admin can `add roles` and `manager users`.
+
+## How to run this project locally
+- Clone the project and open it in a code editor.
+- Open terminal, change directory to root of the project if already not there and run below command:-
+```
+dotnet restore
+```
+- After successful completion of above command, run:-
+```
 dotnet build
-func + F5 to launch on browser
+```
+Or
+- Can press `func + F5` to launch the browser, and it will show a login screen.
 
-to run migrations
-dotnet ef migrations add InitialCreate
+- To Create database and tables, you can run below command:-
+```
+dotnet ef migrations add Init
+```
 
-to update database
+and after successful completion on above command, run:-
+
+```
 dotnet ef database update
+```
 
+- To Create Users and Roles with some default data, you can run `seedData.sql` script, it will create all the roles and default user to use the application.
 
-User Id and password with admin role which can add/remove roles from/to users
-username: deepak
-password: deepak123
+- Also, you can sign up with UserName and Password, it will log in with default role as developer
 
-
-To Add Project Manager role is required
-Admin can give manager role
-
-logout after assigning role and login again to see changes/access
-
-other role: Developer
-username: sanjay
-password: sanjay123
-
-username: anirudh
-password: anirudh123
-
-
-Current Issues:
-No link to reach to projects page? (/AllBugs/{projectId}/) : eg. /AllBugs/1/
-Add bug not working
+## Project Screens with Admin role because it has all the access:-
+### Dashboard
+![Project Overview Dashboard](https://raw.githubusercontent.com/maurya-deepak/Bug-Tracker/master/ReadmeImages/home-screen.png?token=GHSAT0AAAAAAB5ALC5Y7L2ZWPQF2XWKBF2WY6WVHWA)
+### Add Project Screen
+![Add Project Screen](https://raw.githubusercontent.com/maurya-deepak/Bug-Tracker/master/ReadmeImages/add-project-screen.png?token=GHSAT0AAAAAAB5ALC5YSKLGJWVVQJEV34KQY6WVN5A)
+### All Bugs of a Project Dashboard
+![All bugs Dashboard](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/all-bugs-screen.png?raw=true)
+### Add Bug Screen
+![Add Bug Screen](https://raw.githubusercontent.com/maurya-deepak/Bug-Tracker/master/ReadmeImages/add-bug-screen.png?token=GHSAT0AAAAAAB5ALC5YQ4AKCWO2F4JLUFDQY6WVNIA)
