@@ -34,12 +34,5 @@ dotnet ef database update
 
 - Also, you can sign up with UserName and Password, it will log in with default role as developer
 
-## Project Screens with Admin role because it has all the access:-
-### Dashboard
-![Project Overview Dashboard](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/home-screen.png?token=GHSAT0AAAAAAB5ALC5Y7L2ZWPQF2XWKBF2WY6WVHWA)
-### Add Project Screen
-![Add Project Screen](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/add-project-screen.png?token=GHSAT0AAAAAAB5ALC5YSKLGJWVVQJEV34KQY6WVN5A)
-### All Bugs of a Project Dashboard
-![All bugs Dashboard](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/all-bugs-screen.png?raw=true)
-### Add Bug Screen
-![Add Bug Screen](https://github.com/maurya-deepak/Bug-Tracker/blob/master/ReadmeImages/add-bug-screen.png?token=GHSAT0AAAAAAB5ALC5YQ4AKCWO2F4JLUFDQY6WVNIA)
+## Project Demo:-
+[Demo](https://user-images.githubusercontent.com/30929093/215810141-67dc03de-800d-4c8e-a42a-c3a28a4a91a9.mp4)
