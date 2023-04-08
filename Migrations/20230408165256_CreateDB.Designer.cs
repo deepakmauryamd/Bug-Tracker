@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BugTracker.Migrations
 {
     [DbContext(typeof(BugtrackerContext))]
-    [Migration("20230126134743_changeDataTypeOfUserProjectMap")]
-    partial class changeDataTypeOfUserProjectMap
+    [Migration("20230408165256_CreateDB")]
+    partial class CreateDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -89,7 +89,7 @@ namespace BugTracker.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ResolvedOn")
+                    b.Property<DateTime?>("ResolvedOn")
                         .HasColumnType("datetime");
 
                     b.Property<string>("Title")

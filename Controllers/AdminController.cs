@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 
 namespace BugTracker.Controllers
@@ -17,11 +18,17 @@ namespace BugTracker.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public AdminController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public AdminController(
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration
+        )
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         [HttpGet("/createroles")]
@@ -244,5 +251,46 @@ namespace BugTracker.Controllers
             return RedirectToAction(nameof(EditRole), new { Id = roleId });
         }
 
+        [AllowAnonymous]
+        [Route("/role/admin/")]
+        public async Task<IActionResult> CreateAdminUser()
+        {
+            if (await _userManager.Users.AnyAsync())
+            {
+                if (!User.IsInRole("Admin"))
+                {
+                    return Forbid();
+                }
+            }
+
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            ApplicationUser admin = await _userManager.FindByNameAsync("admin");
+            if (admin != null)
+            {
+                return BadRequest("Admin user already exists.");
+            }
+            var adminPassword = _configuration["AdminPassword"];
+            if (string.IsNullOrEmpty(adminPassword))
+            {
+                return BadRequest("Admin password not set in configuration.");
+            }
+
+            var adminUser = new ApplicationUser
+            {
+                UserName = "admin",
+                Email = "admin@example.com"
+            };
+            var result = await _userManager.CreateAsync(adminUser, adminPassword);
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(adminUser, "Admin");
+                return Ok("Admin user created successfully.");
+            }
+            return BadRequest("Something went Wrong.");
+        }
     }
 }
