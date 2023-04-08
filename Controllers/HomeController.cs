@@ -48,7 +48,7 @@ namespace BugTracker.Controllers
             ViewBag.Message = message;
             
             var result = new PagedResult<ProjectModel>{
-                Data = projects.ToList(),
+                Data = projects?.ToList() ?? new List<ProjectModel>(),
                 TotalItems = details.Item1,
                 PageNumber = pageNumber,
                 PageSize = pageSize
@@ -165,7 +165,7 @@ namespace BugTracker.Controllers
                     totalBugsCount += await _bugRepo.TotalBugs(project.Id);
                 }
             }
-            var result = new Tuple<int, int , int>(projects.Count(), totalResolvedBugsCount, totalBugsCount);
+            var result = new Tuple<int, int , int>(projects?.Count() ?? 0, totalResolvedBugsCount, totalBugsCount);
             return result;
         }
         [AllowAnonymous]
