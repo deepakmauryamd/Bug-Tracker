@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BugTracker.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class CreateDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -260,7 +260,7 @@ namespace BugTracker.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false),
-                    ResolvedOn = table.Column<DateTime>(type: "datetime", nullable: false),
+                    ResolvedOn = table.Column<DateTime>(type: "datetime", nullable: true),
                     BugPriorityId = table.Column<int>(type: "int", nullable: false),
                     BugStatusId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -292,8 +292,8 @@ namespace BugTracker.Migrations
                 name: "UserProjectMaps",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(95)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ApplicationUserId = table.Column<string>(type: "varchar(95)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ProjectId = table.Column<int>(type: "int", nullable: false)

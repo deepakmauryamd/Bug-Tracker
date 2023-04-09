@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using cloudscribe.Pagination.Models;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using BugTracker.BusinessLogic;
 
 namespace BugTracker.Controllers
 {
@@ -16,62 +18,69 @@ namespace BugTracker.Controllers
     {
         private readonly IProjectRepository _projectRepo;
         private readonly IBugRepository _bugRepo;
+        private readonly IServiceProvider _container;
 
-        public ProjectBugController(IProjectRepository projectRepo, IBugRepository bugRepo)
+        public ProjectBugController(IProjectRepository projectRepo, IBugRepository bugRepo, IServiceProvider container)
         {
             _projectRepo = projectRepo;
             _bugRepo = bugRepo;
+            _container = container;
         }
 
-        [HttpGet("/AllBugs/{pId}", Name = "AllBugsActionMethod")]
-        public async Task<ActionResult> AllBugs(int pId, string successMessage, int pageNumber = 1, int pageSize = 5)
+        [HttpGet("/AllBugs/{projectId}", Name = "AllBugsActionMethod")]
+        public async Task<ActionResult> AllBugs(uint projectId, string successMessage, int pageNumber = 1, int pageSize = 5)
         {
-            if (pId > 0)
+            if (projectId == 0)
             {
-                var project = await _projectRepo.GetProjectNameById(pId);
-                if (project != null)
-                {
-                    int excludeRecords = (pageNumber * pageSize) - pageSize;
-                    var BugList = await _bugRepo.GetAllBugs(pId, pageSize, excludeRecords) ?? new List<BugModel>();
-                    int totalBugCount = await _bugRepo.TotalBugs(pId);
-                    ViewBag.ProjectName = project.Name;
-                    ViewBag.ProjectId = pId;
-                    ViewBag.SuccessMessage = successMessage;
-                    var result = new PagedResult<BugModel>
-                    {
-                        Data = BugList.ToList(),
-                        TotalItems = totalBugCount,
-                        PageNumber = pageNumber,
-                        PageSize = pageSize
-                    };
-                    return View(result);
-                }
+                return BadRequest();
             }
-            return RedirectToAction("Index", "Home");
+            var projectLogic = _container.GetRequiredService<IProject>();
+            ProjectModel project = await projectLogic.GetProjectDetailById(projectId);
+            if (project == null || project.Id <= 0)
+            {
+                return BadRequest();
+            }
+            int excludeRecords = (pageNumber * pageSize) - pageSize;
+            var BugList = await _bugRepo.GetAllBugs((int)projectId, pageSize, excludeRecords) ?? new List<BugModel>();
+            int totalBugCount = await _bugRepo.TotalBugs((int)projectId);
+            ViewBag.ProjectName = project.Name;
+            ViewBag.ProjectId = projectId;
+            ViewBag.SuccessMessage = successMessage;
+            var result = new PagedResult<BugModel>
+            {
+                Data = BugList.ToList(),
+                TotalItems = totalBugCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            return View(result);
+
         }
 
-        [HttpGet("/AddBug/{id}")]
-        public async Task<ActionResult> AddBug(int Id, string message = null)
+        [HttpGet("/AddBug/{projectId}")]
+        public async Task<ActionResult> AddBug(uint projectId, string message = null)
         {
-            var project = await _projectRepo.GetProjectDetails(Id);
-            if (project != null)
+            var projectLogic = _container.GetRequiredService<IProject>();
+            ProjectModel project = await projectLogic.GetProjectDetailById(projectId);
+            if (project == null)
             {
-                BugModel model = new BugModel();
-
-                model.ProjectName = project.Name;
-                model.ProjectId = Id;
-
-                var bugPriorityList = await _bugRepo.GetBugPriorityList();
-                var teamMembers = await _projectRepo.GetTeamMembers(Id);
-
-                ViewBag.bugPriorityList = bugPriorityList;
-                ViewBag.teamMembers = new SelectList(teamMembers, "Id", "Name");
-
-                ViewBag.message = message;
-
-                return View(model);
+                return BadRequest();
             }
-            return RedirectToAction("Index", "Home");
+            BugModel model = new BugModel
+            {
+                ProjectName = project.Name,
+                ProjectId = (int)projectId,
+            };
+
+            var bugPriorityList = await _bugRepo.GetBugPriorityList();
+            var teamMembers = await projectLogic.GetTeamMembersByProjectId(projectId);
+
+            ViewBag.bugPriorityList = bugPriorityList;
+            ViewBag.teamMembers = new SelectList(teamMembers, "Id", "Name");
+
+            ViewBag.message = message;
+
+            return View(model);
         }
 
         [HttpPost("AddBug/{id}")]

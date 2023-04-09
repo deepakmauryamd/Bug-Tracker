@@ -60,13 +60,13 @@
                     @foreach(var project in Model.Data)
                     {
                         <tr>
-                            <td><a asp-controller="ProjectBug" asp-action="AllBugs" asp-route-pid="@project.Id">@project.Name</a></td>
+                            <td><a asp-controller="ProjectBug" asp-action="AllBugs" asp-route-projectId="@project.Id">@project.Name</a></td>
                             <td>@project.TotalBugs</td>
                             <td>@project.ProjectManager</td>
                             <td>@project.TeamMembersCount</td>
                             @if(User.IsInRole("Manager"))
                             {
-                                <td><a asp-controller="Home" asp-action="EditProject" asp-route-id="@project.Id">Edit</a></td>
+                                <td><a asp-controller="Home" asp-action="EditProject" asp-route-projectId="@project.Id">Edit</a></td>
                                 <td><a href="" data-toggle="modal" data-target="#exampleModalCenter" class="delete-btn" data-id="@project.Id" data-projectname="@project.Name"><img class="Image-icon" src="~/images/trash.svg"/></a></td>
                             }
                         </tr>
@@ -96,10 +96,11 @@ else
                 });
 
                 const projectId = $(this).data('id');
+                console.log("Project ID: ", projectId);
                 const projectName = $(this).data('projectname');
                 
                 $(".modal-body").append(`<div id="projectName">Are you sure you want to delete project <p class="font-weight-bold">${projectName}</p></div>`);
-                $(".delete-form").attr('action', `/Home/DeleteProject/${projectId}`);
+                $(".delete-form").attr('action', `/DeleteProject/${projectId}`);
                 
             });
             

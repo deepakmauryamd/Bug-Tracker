@@ -266,7 +266,7 @@ namespace BugTracker.Repository
             {
                 using (IDbConnection conn = Connection)
                 {
-                    string query = @"   Select Name 
+                    string query = @"   Select Name, Id
                                         From Projects 
                                         Where Id = @ProjectId";
 
