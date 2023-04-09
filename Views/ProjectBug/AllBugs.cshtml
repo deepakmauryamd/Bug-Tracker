@@ -8,7 +8,7 @@
 <div class="container">
     <div class="row mt-5 d-md-flex d-lg-flex justify-content-between">
         <h3 class="display-5">Project - <span class="font-weight-bold">@ViewBag.ProjectName</span></h3>
-        <a asp-controller="ProjectBug" asp-action="AddBug" asp-route-id="@ViewBag.ProjectId" class="btn btn-lg btn-primary">Add Bug</a>
+        <a asp-controller="ProjectBug" asp-action="AddBug" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-lg btn-primary">Add Bug</a>
     </div>
     @if(ViewBag.SuccessMessage != null)
     {

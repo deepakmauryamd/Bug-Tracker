@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using BugTracker.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BugTracker.Repository;
@@ -13,6 +11,8 @@ using BugTracker.Data;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using cloudscribe.Pagination.Models;
+using BugTracker.BusinessLogic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BugTracker.Controllers
 {
@@ -22,22 +22,31 @@ namespace BugTracker.Controllers
         private readonly IProjectRepository _projectRepo;
         private readonly IBugRepository _bugRepo;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IServiceProvider _container;
 
-        public HomeController(IProjectRepository projectRepo, IBugRepository bugRepo, UserManager<ApplicationUser> userManager)
+        public HomeController(
+            IProjectRepository projectRepo,
+            IBugRepository bugRepo,
+            UserManager<ApplicationUser> userManager,
+            IServiceProvider container
+        )
         {
             _projectRepo = projectRepo;
             _bugRepo = bugRepo;
             _userManager = userManager;
+            _container = container;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string message=null, int pageNumber=1, int pageSize=5)
+        public async Task<IActionResult> Index(string message = null, int pageNumber = 1, int pageSize = 5)
         {
             int excludeRecords = (pageNumber * pageSize) - pageSize;
-            var projects = await _projectRepo.GetProjects(pageSize, excludeRecords);
-            if(projects != null && projects.Any())
+            var projectLogic = _container.GetRequiredService<IProject>();
+
+            IEnumerable<ProjectModel> projects = await projectLogic.GetProjects(pageSize, excludeRecords);
+            if (projects != null && projects.Any())
             {
-                foreach(var project in projects)
+                foreach (var project in projects)
                 {
                     project.TotalBugs = await _bugRepo.TotalBugs(project.Id);
                 }
@@ -46,8 +55,9 @@ namespace BugTracker.Controllers
             ViewBag.totalResolvedBugsCount = details.Item2;
             ViewBag.totalBugsCount = details.Item3;
             ViewBag.Message = message;
-            
-            var result = new PagedResult<ProjectModel>{
+
+            var result = new PagedResult<ProjectModel>
+            {
                 Data = projects?.ToList() ?? new List<ProjectModel>(),
                 TotalItems = details.Item1,
                 PageNumber = pageNumber,
@@ -71,7 +81,8 @@ namespace BugTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                bool isAdded = await _projectRepo.AddProject(model);
+                var projectLogic = _container.GetRequiredService<IProject>();
+                bool isAdded = await projectLogic.AddProject(model);
                 if (isAdded)
                 {
                     return RedirectToAction(nameof(Index));
@@ -81,12 +92,13 @@ namespace BugTracker.Controllers
         }
 
         [Authorize(Roles = "Manager")]
-        [HttpGet("/EditProject/{id}")]
-        public async Task<ActionResult> EditProject(int Id, string message = null)
+        [HttpGet("/EditProject/{projectId}")]
+        public async Task<ActionResult> EditProject(uint projectId, string message = null)
         {
-            if (Id > 0)
+            if (projectId > 0)
             {
-                var project = await _projectRepo.GetProjectDetails(Id);
+                var projectLogic = _container.GetRequiredService<IProject>();
+                ProjectModel project = await projectLogic.GetProjectDetailById(projectId);
                 if (project != null)
                 {
                     ViewBag.projectManagers = await GetProjctManagers(project.ProjectManagerId);
@@ -100,26 +112,29 @@ namespace BugTracker.Controllers
         }
 
         [Authorize(Roles = "Manager")]
-        [HttpPost("/EditProject/{id}")]
-        public async Task<ActionResult> EditProject(int Id, ProjectModel model)
+        [HttpPost("/EditProject/{projectId}")]
+        public async Task<ActionResult> EditProject(int projectId, ProjectModel project)
         {
             if (ModelState.IsValid)
             {
-
-                var isEditSuccess = await _projectRepo.EditProject(model);
+                project.Id = projectId;
+                var projectLogic = _container.GetRequiredService<IProject>();
+                bool isEditSuccess = await projectLogic.EditProject(project);
                 if (isEditSuccess)
                 {
                     return RedirectToAction("Index", "Home");
                 }
             }
-            return RedirectToAction(nameof(EditProject), new { Id = model.Id, message = "Please Select any one team member" });
+            return RedirectToAction(nameof(EditProject), new { Id = project.Id, message = "Please Select any one team member" });
         }
 
-        public async Task<ActionResult> DeleteProject(int Id)
+        [HttpPost("/DeleteProject/{projectId}")]
+        public async Task<ActionResult> DeleteProject(uint projectId)
         {
-            if (Id > 0)
+            if (projectId > 0)
             {
-                var isDeleted = await _projectRepo.DeleteProject(Id);
+                var projectLogic = _container.GetRequiredService<IProject>();
+                bool isDeleted = await projectLogic.DeleteProject(projectId);
                 if (isDeleted)
                 {
                     string message = "Project deleted successfully";
@@ -154,18 +169,19 @@ namespace BugTracker.Controllers
 
         private async Task<Tuple<int, int, int>> OverallDetails()
         {
-            var projects = await _projectRepo.AllProjects();
-            int totalResolvedBugsCount =0;
-            int totalBugsCount=0;
+            var projectLogic = _container.GetRequiredService<IProject>();
+            IEnumerable<ProjectModel> projects = await projectLogic.GetAllProjects();
+            int totalResolvedBugsCount = 0;
+            int totalBugsCount = 0;
             if (projects != null && projects.Any())
-            {     
+            {
                 totalResolvedBugsCount = await _bugRepo.GetResolvedBugCount();
                 foreach (var project in projects)
                 {
                     totalBugsCount += await _bugRepo.TotalBugs(project.Id);
                 }
             }
-            var result = new Tuple<int, int , int>(projects?.Count() ?? 0, totalResolvedBugsCount, totalBugsCount);
+            var result = new Tuple<int, int, int>(projects?.Count() ?? 0, totalResolvedBugsCount, totalBugsCount);
             return result;
         }
         [AllowAnonymous]

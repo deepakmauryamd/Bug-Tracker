@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BugTracker.Data;
 using BugTracker.Repository;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
+using BugTracker.BusinessLogic;
 
 namespace BugTracker
 {
@@ -29,8 +27,8 @@ namespace BugTracker
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IProjectRepository, ProjectRepository>();
-
             services.AddTransient<IBugRepository, BugRepository>();
+            services.AddTransient<IProject, BusinessLogic.Project>();
 
             services.AddDbContext<BugtrackerContext>(options => options.UseMySql
                     (Configuration.GetConnectionString("bugtrackerdbString"), new MySqlServerVersion(new Version())));
@@ -51,8 +49,6 @@ namespace BugTracker
                 options.LoginPath = "/login";
                 options.AccessDeniedPath = "/accessdenied";
             });
-
-            // services.AddRazorPages().AddRazorRuntimeCompilation();
 
             services.AddControllersWithViews();
             services.AddCloudscribePagination();
